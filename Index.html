@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="10h Vélo NSV">
+<meta name="theme-color" content="#efe6d2">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚲</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%233b1219%22/><text x=%2250%22 y=%2266%22 font-size=%2255%22 text-anchor=%22middle%22>🚲</text></svg>">
+<title>10 Heures Vélo NSV — Staff</title>
+<style>
+  :root{
+    --asphalt: #3b1219;
+    --asphalt-2: #4a1822;
+    --asphalt-3: #5c222c;
+    --paper: #efe6d2;
+    --paper-2: #e2d5b8;
+    --ink: #2e211b;
+    --lime: #efe6d2;
+    --lime-dim: #dbc9a0;
+    --forest: #6e2530;
+    --forest-2: #7f2c3b;
+    --alert: #8b1e2b;
+    --muted: #7a6e5d;
+    --line: #d9cba8;
+    --radius: 3px;
+  }
+  *{box-sizing:border-box;}
+  html{ scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .app{max-width:1000px;margin:0 auto;padding:0 0 60px;}
+
+  /* ---------- HEADER ---------- */
+  .header{
+    background: var(--paper);
+    color: var(--ink);
+    padding: 28px 24px 22px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    flex-wrap:wrap;
+    border-bottom: 4px solid var(--asphalt);
+  }
+  .header-title{display:flex; flex-direction:column; gap:4px;}
+  .eyebrow{
+    font-family: "Arial Narrow", "Helvetica Neue", sans-serif;
+    font-weight:700;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    font-size:11px;
+    color: var(--forest);
+  }
+  .title{
+    font-family: "Arial Narrow", "Helvetica Neue", sans-serif;
+    font-weight:800;
+    letter-spacing:0.01em;
+    text-transform:uppercase;
+    font-size:30px;
+    line-height:1;
+  }
+  .subtitle{font-size:12.5px;color:var(--muted);}
+
+  .ring-wrap{display:flex;align-items:center;gap:18px;margin-right:64px;}
+  .ring-svg{width:92px;height:92px;flex-shrink:0;}
+  .ring-track{fill:none;stroke:var(--line);stroke-width:6;}
+  .ring-progress{fill:none;stroke:var(--forest);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 0.6s ease;}
+  .ring-num{
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size:20px;
+    font-weight:700;
+    fill: var(--ink);
+  }
+  .ring-label{
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size:8.5px;
+    fill: var(--forest);
+    letter-spacing:0.05em;
+  }
+  .event-date-edit{
+    font-size:11px;color:var(--muted);cursor:pointer;text-decoration:underline;text-underline-offset:3px;
+    background:none;border:none;padding:0;font-family:inherit;
+  }
+  .event-date-edit:hover{color:var(--forest);}
+
+  .stats{display:flex;gap:22px;}
+  .stat{display:flex;flex-direction:column;gap:2px;}
+  .stat-num{
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size:22px;font-weight:700;color:var(--ink);
+  }
+  .stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;}
+
+  /* ---------- NAV (checkpoints) ---------- */
+  .nav{
+    display:flex;
+    background: var(--asphalt-2);
+    border-bottom:1px solid var(--asphalt-3);
+    position:relative;
+    overflow-x:auto;
+  }
+  .nav::before{
+    content:"";
+    position:absolute;
+    top:50%;left:0;right:0;
+    height:2px;
+    background: var(--asphalt-3);
+    z-index:0;
+  }
+  .nav-btn{
+    position:relative;z-index:1;
+    flex:1;
+    min-width:120px;
+    background:none;border:none;
+    padding:14px 10px 12px;
+    color:#9a9d94;
+    font-family: "Arial Narrow","Helvetica Neue",sans-serif;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    font-size:12.5px;
+    cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    transition:color 0.15s ease;
+  }
+  .nav-dot{
+    width:9px;height:9px;border-radius:50%;
+    background: var(--asphalt-3);
+    border:2px solid var(--asphalt-3);
+    transition: all 0.15s ease;
+  }
+  .nav-btn:hover{color:var(--paper);}
+  .nav-btn.active{color:var(--lime);}
+  .nav-btn.active .nav-dot{background:var(--lime);border-color:var(--lime);}
+
+  /* ---------- CONTENT ---------- */
+  .view{padding:26px 24px;animation:fadeIn 0.25s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+  .view-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px;gap:12px;flex-wrap:wrap;}
+  .view-title{font-family:"Arial Narrow","Helvetica Neue",sans-serif;font-weight:800;text-transform:uppercase;font-size:19px;letter-spacing:0.02em;}
+  .view-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .btn{
+    background: var(--forest);
+    color: var(--paper);
+    border:none;
+    padding:9px 16px;
+    border-radius:var(--radius);
+    font-weight:700;
+    font-size:12.5px;
+    letter-spacing:0.03em;
+    cursor:pointer;
+    text-transform:uppercase;
+    font-family:"Arial Narrow","Helvetica Neue",sans-serif;
+  }
+  .btn:hover{background:var(--forest-2);}
+  .btn.lime{background:var(--lime);color:var(--asphalt);}
+  .btn.lime:hover{background:var(--lime-dim);}
+  .btn.ghost{background:none;border:1px solid var(--line);color:var(--ink);}
+  .btn.ghost:hover{border-color:var(--muted);}
+  .form-panel .btn.ghost{color:var(--paper);border-color:var(--asphalt-3);}
+  .form-panel .btn.ghost:hover{border-color:var(--paper);}
+  .btn.small{padding:5px 10px;font-size:11px;}
+
+  /* filter chips */
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+  .chip{
+    padding:7px 12px;border-radius:20px;border:1px solid var(--line);
+    font-size:11.5px;cursor:pointer;background:var(--paper);color:var(--muted);
+    font-weight:600;
+  }
+  .chip.active{background:var(--asphalt);color:var(--lime);border-color:var(--asphalt);}
+
+  /* task card */
+  .card{
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px 16px;margin-bottom:10px;
+    display:flex;gap:14px;align-items:flex-start;
+  }
+  .card.done{opacity:0.5;}
+  .checkbox{
+    width:20px;height:20px;border-radius:50%;border:2px solid var(--forest);
+    flex-shrink:0;cursor:pointer;margin-top:2px;
+    display:flex;align-items:center;justify-content:center;background:none;padding:0;
+  }
+  .checkbox.checked{background:var(--forest);}
+  .checkbox svg{width:11px;height:11px;display:none;}
+  .checkbox.checked svg{display:block;}
+  .card-body{flex:1;min-width:0;}
+  .card-title{font-weight:700;font-size:14.5px;margin-bottom:4px;}
+  .highlight{background:#f0dde0;color:var(--ink);padding:1px 5px;border-radius:2px;box-decoration-break:clone;-webkit-box-decoration-break:clone;}
+  .warn-icon{font-size:12px;margin-left:2px;}
+  .card-title.strike{text-decoration:line-through;}
+  .card-meta{display:flex;gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);}
+  .tag{
+    display:inline-flex;align-items:center;gap:4px;
+    padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:700;text-transform:uppercase;
+    letter-spacing:0.03em;
+  }
+  .tag.cat{background:var(--paper-2);color:var(--forest);}
+  .tag.prio-urgent{background:var(--alert);color:var(--paper);}
+  .tag.prio-haute{background:#f0dde0;color:var(--alert);}
+  .tag.prio-moyenne{background:var(--paper-2);color:var(--forest);}
+  .tag.prio-basse{background:var(--paper-2);color:var(--muted);}
+  .tag.prio-termine{background:var(--forest);color:var(--paper);}
+  .card-actions{display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
+  .del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:6px;min-width:32px;min-height:32px;display:inline-flex;align-items:center;justify-content:center;}
+  .del-btn:hover{color:var(--alert);}
+
+  /* forms */
+  .form-panel{
+    background:var(--asphalt);color:var(--paper);
+    border-radius:var(--radius);padding:18px;margin-bottom:18px;
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;
+  }
+  .form-panel.hidden{display:none;}
+  .field label{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:0.05em;color:var(--lime);margin-bottom:5px;font-weight:700;}
+  .field input, .field select, .field textarea{
+    width:100%;padding:10px 9px;border-radius:var(--radius);border:1px solid var(--asphalt-3);
+    background:var(--asphalt-2);color:var(--paper);font-size:16px;font-family:inherit;
+  }
+  .field textarea{resize:vertical;min-height:50px;}
+  .form-actions{grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end;margin-top:4px;}
+
+  /* table (budget / participants) */
+  .table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+  .table th{
+    text-align:left;background:var(--paper-2);font-size:10.5px;text-transform:uppercase;
+    letter-spacing:0.05em;color:var(--muted);padding:9px 12px;font-weight:700;
+  }
+  .table td{padding:10px 12px;font-size:13px;border-top:1px solid var(--line);}
+  .table td.num{font-family:ui-monospace,monospace;text-align:right;}
+  .table tr:hover td{background:#faf9f4;}
+  .row-recette{color:var(--ink);font-weight:700;}
+  .row-depense{color:var(--alert);font-weight:700;}
+
+  .balance-strip{
+    display:flex;gap:24px;margin-bottom:16px;flex-wrap:wrap;
+  }
+  .balance-box{
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    padding:12px 18px;flex:1;min-width:130px;
+  }
+  .balance-label{font-size:10.5px;text-transform:uppercase;color:var(--muted);letter-spacing:0.05em;font-weight:700;}
+  .balance-val{font-family:ui-monospace,monospace;font-size:22px;font-weight:700;margin-top:3px;}
+  .balance-val.pos{color:var(--ink);}
+  .balance-val.neg{color:var(--alert);}
+
+  /* timeline */
+  .timeline{position:relative;padding-left:26px;}
+  .timeline::before{content:"";position:absolute;left:6px;top:4px;bottom:4px;width:2px;background:var(--line);}
+  .tl-date-group{margin-bottom:20px;}
+  .tl-date-group:last-child{margin-bottom:0;}
+  .tl-item{position:relative;margin-bottom:10px;}
+  .tl-item:last-child{margin-bottom:0;}
+  .tl-dot{
+    position:absolute;left:-26px;top:3px;width:13px;height:13px;border-radius:50%;
+    background:#fff;border:2px solid var(--forest);
+  }
+  .tl-dot.done{background:var(--forest);}
+  .tl-date{font-family:ui-monospace,monospace;font-size:11.5px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+  .tl-title{font-weight:700;font-size:14px;}
+  .tl-title.strike{text-decoration:line-through;color:var(--muted);}
+  .tl-desc{font-size:12.5px;color:var(--muted);margin-top:2px;}
+
+  .empty{text-align:center;padding:36px 20px;color:var(--muted);font-size:13px;}
+  .empty b{display:block;color:var(--ink);font-size:15px;margin-bottom:4px;}
+
+  .toast{
+    position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--asphalt);color:var(--lime);padding:10px 18px;border-radius:var(--radius);
+    font-size:12.5px;font-weight:600;opacity:0;pointer-events:none;transition:all 0.25s ease;z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .staff-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+  .staff-tag{background:var(--paper-2);padding:4px 10px;border-radius:20px;font-size:11.5px;display:flex;gap:6px;align-items:center;}
+  .staff-tag button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;}
+  .staff-add{display:flex;gap:6px;}
+  .staff-add input{padding:6px 9px;border:1px solid var(--line);border-radius:var(--radius);font-size:12px;width:130px;}
+
+  /* modal (remplace prompt/confirm/alert, bloqués dans le sandbox) */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(30,12,15,0.6);
+    display:flex;align-items:center;justify-content:center;
+    z-index:100;opacity:0;pointer-events:none;transition:opacity 0.15s ease;padding:16px;
+  }
+  .modal-overlay.show{opacity:1;pointer-events:auto;}
+  .modal-box{
+    background:#fff;border-radius:6px;padding:20px;width:100%;max-width:360px;
+    box-shadow:0 12px 40px rgba(0,0,0,0.25);
+  }
+  .modal-title{font-family:"Arial Narrow","Helvetica Neue",sans-serif;font-weight:800;text-transform:uppercase;font-size:15px;margin-bottom:12px;letter-spacing:0.02em;}
+  .modal-body{margin-bottom:16px;font-size:13.5px;color:var(--ink);}
+  .modal-body input{width:100%;padding:10px 9px;border-radius:var(--radius);border:1px solid var(--line);font-size:16px;font-family:inherit;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;}
+
+  /* multi-select responsable chips */
+  .chip.person{position:relative;}
+  .chip.person.active{background:var(--forest);color:var(--paper);border-color:var(--forest);}
+
+  /* settings button (accès Staff & Inscriptions) */
+  .header{position:relative;}
+  .settings-btn{
+    position:absolute;top:24px;right:24px;
+    width:36px;height:36px;border-radius:50%;
+    border:1px solid var(--line);background:#fff;color:var(--muted);
+    font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .settings-btn:hover{border-color:var(--forest);color:var(--forest);}
+  .settings-btn.active{background:var(--asphalt);color:var(--lime);border-color:var(--asphalt);}
+  .refresh-btn{top:68px;}
+  .refresh-btn.spinning{animation:spin 0.6s linear;}
+  @keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+
+  /* planning view mode toggle */
+  .view-head .chips{margin-bottom:0;}
+
+  /* calendar */
+  .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .cal-month-label{font-family:"Arial Narrow","Helvetica Neue",sans-serif;font-weight:800;text-transform:capitalize;font-size:15px;letter-spacing:0.02em;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+  .cal-grid-head{margin-bottom:6px;}
+  .cal-headcell{font-size:10px;text-transform:uppercase;color:var(--muted);text-align:center;font-weight:700;letter-spacing:0.05em;padding:2px 0;}
+  .cal-day{
+    position:relative;aspect-ratio:1/1;background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;
+  }
+  .cal-day.empty{background:none;border:none;cursor:default;}
+  .cal-day:not(.empty):hover{border-color:var(--forest);}
+  .cal-day.today{border-color:var(--forest);border-width:2px;}
+  .cal-day.selected{background:var(--asphalt);border-color:var(--asphalt);}
+  .cal-day.selected .cal-daynum{color:var(--lime);}
+  .cal-daynum{font-size:12.5px;font-weight:700;}
+  .cal-count-badge{
+    min-width:16px;height:15px;padding:0 4px;border-radius:8px;
+    font-size:9.5px;font-weight:800;color:#fff;
+    display:flex;align-items:center;justify-content:center;line-height:1;
+  }
+  .cal-dot-alert{background:var(--alert);}
+  .cal-dot-urgent{background:#b5791f;}
+  .cal-dot-normal{background:var(--forest);}
+  .cal-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin:14px 0 20px;align-items:center;}
+  .cal-legend .cal-count-badge{margin-right:5px;vertical-align:middle;}
+  .cal-detail{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;}
+  .cal-detail-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+
+  /* discussion */
+  .chat-box{
+    max-height:440px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--radius);
+    background:#fff;padding:14px;margin-bottom:14px;display:flex;flex-direction:column;gap:12px;
+  }
+  .chat-msg{border-bottom:1px solid var(--line);padding-bottom:10px;}
+  .chat-msg:last-child{border-bottom:none;padding-bottom:0;}
+  .chat-msg-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .chat-author{font-weight:700;font-size:12.5px;color:var(--forest);}
+  .chat-time{font-size:10.5px;color:var(--muted);}
+  .chat-msg-head .del-btn{margin-left:auto;font-size:13px;}
+  .chat-text{font-size:13.5px;white-space:pre-wrap;line-height:1.45;word-break:break-word;}
+  .mention-tag{background:var(--paper-2);color:var(--forest);font-weight:700;padding:1px 5px;border-radius:4px;}
+  .chat-compose{position:relative;display:flex;gap:8px;align-items:flex-end;}
+  .chat-compose textarea{
+    flex:1;padding:11px 12px;border:1px solid var(--line);border-radius:var(--radius);
+    font-size:16px;font-family:inherit;resize:vertical;min-height:44px;background:#fff;color:var(--ink);
+  }
+  .mention-dropdown{
+    position:absolute;bottom:100%;left:0;margin-bottom:6px;background:#fff;border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:0 6px 20px rgba(0,0,0,0.15);max-height:180px;overflow-y:auto;
+    width:220px;z-index:20;
+  }
+  .mention-dropdown.hidden{display:none;}
+  .mention-option{padding:8px 12px;font-size:12.5px;cursor:pointer;}
+  .mention-option:hover{background:var(--paper-2);}
+  .mention-option strong{color:var(--forest);}
+
+  @media(max-width:640px){
+    .header{padding:20px 16px;}
+    .title{font-size:24px;}
+    .stats{gap:14px;}
+    .view{padding:18px 14px;}
+    .settings-btn{top:16px;right:16px;width:32px;height:32px;font-size:14px;}
+    .refresh-btn{top:56px;}
+    .ring-wrap{margin-right:44px;}
+    .cal-daynum{font-size:11px;}
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <div class="header">
+    <div class="header-title">
+      <div class="eyebrow">Staff · Préparation événement</div>
+      <div class="title">10 Heures Vélo NSV</div>
+      <button class="event-date-edit" id="dateEditBtn">définir la date de l'événement</button>
+    </div>
+
+    <div class="ring-wrap">
+      <svg class="ring-svg" viewBox="0 0 100 100">
+        <circle class="ring-track" cx="50" cy="50" r="42"></circle>
+        <circle class="ring-progress" id="ringProgress" cx="50" cy="50" r="42" stroke-dasharray="264" stroke-dashoffset="264" transform="rotate(-90 50 50)"></circle>
+        <text x="50" y="47" text-anchor="middle" class="ring-num" id="ringNum">--</text>
+        <text x="50" y="60" text-anchor="middle" class="ring-label" id="ringLabel">J-?</text>
+      </svg>
+      <div class="stats">
+        <div class="stat"><div class="stat-num" id="statTasks">0/0</div><div class="stat-label">Tâches</div></div>
+        <div class="stat"><div class="stat-num" id="statParticipants">0</div><div class="stat-label">Troupes</div></div>
+      </div>
+    </div>
+
+    <button class="settings-btn" id="settingsBtn" title="Staff &amp; Inscriptions">⚙️</button>
+    <button class="settings-btn refresh-btn" id="refreshBtn" title="Actualiser les données">🔄</button>
+  </div>
+
+  <div class="nav" id="nav">
+    <button class="nav-btn active" data-view="tasks"><span class="nav-dot"></span>Tâches</button>
+    <button class="nav-btn" data-view="planning"><span class="nav-dot"></span>Planning</button>
+    <button class="nav-btn" data-view="discussion"><span class="nav-dot"></span>Discussion</button>
+  </div>
+
+  <div id="viewContainer"></div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="btn ghost" id="modalCancel">Annuler</button>
+      <button class="btn lime" id="modalConfirm">OK</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// URL de l'application web Google Apps Script qui sert de stockage partagé.
+// Aucun compte Claude requis pour lire/écrire ici : ça fonctionne pour tout le monde.
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCaKLj-iVyAe3oond99OX0pXXUlsa6_DQV7a1otHC4VkcY-qkRwz6MhoHqYG4dwvk_Pw/exec';
+
+/* Données de base : événement 2026-2027, seedées avec les vraies tâches
+   (titres, échéances, notes, liens, budget) fournies par Florian. */
+let data = {
+  "eventDate": "",
+  "staff": [],
+  "tasks": [
+    {"id":"msfwf54ag40q","assignees":[],"title":"Contacter la commune","category":"Administratif","status":"pasCommence","priority":"haute","due":"2026-09-30","notes":"Bloquer parcours, autorisations, place de Nil, news commune etc...","links":[{"label":"Dossier drive commune à reprendre","url":"https://drive.google.com/drive/folders/1uD3nRT54pJUXo7NytC-tQh9Ifu479g3l?usp=share_link"}]},
+    {"id":"msfwf54ae6jz","assignees":[],"title":"Envoyer les invitations aux autres troupes","category":"Contact","status":"pasCommence","priority":"haute","due":"2026-09-30","notes":"Envoyer un mail aux unités : SV019 (Corroy), SV020, BW022 (MSG), SV049 (Dion), SV010, SV036, NO22 (Gembloux), SV004, SV021, SV002, NO007, NO017, BW010, BW001, BW033, BW111, BW064, BW006, HB010, HB007, HB031","links":[{"label":"Inscrits de l'année passé","url":"https://docs.google.com/spreadsheets/d/12p2U1-Adzp0vEHAFFea5jFnV43-DwuDZkaOvrU_YmC0/edit?usp=sharing"}]},
+    {"id":"msfwf54a36s8","assignees":[],"title":"Vérifier admin : règlement, courses,...","category":"Administratif","status":"pasCommence","priority":"basse","due":"2026-09-30","notes":"Recheck le réglement 2026 et insisté sur le vélo type vtt donc avec fourche avec suspension","links":[{"label":"Réglement 2026","url":"https://docs.google.com/document/d/1deD62MDLgKuEwdxG3sWOOKOjEtJ4NG_YApFjUVfCN5s/edit?usp=sharing"}]},
+    {"id":"msfwf54ak1pj","assignees":[],"title":"Formulaire d'inscription des troupes","category":"Administratif","status":"pasCommence","priority":"basse","due":"2026-09-30","notes":"Faire le forms pour les inscriptions","links":[{"label":"Lien 2026","url":"https://docs.google.com/document/d/1pdE69v08SRMjd-RrVnuXiKPMHqdFBzocx28prknbMSE/edit?usp=sharing"}]},
+    {"id":"msfwf54aq04a","assignees":[],"title":"Contacter Jadinon","category":"Commande","status":"pasCommence","priority":"haute","due":"2026-10-01","notes":"Réserver la jadi","links":[]},
+    {"id":"msfwf54a35mv","assignees":[],"title":"Contacter les pis pour des stands","category":"Contact","status":"pasCommence","priority":"moyenne","due":"2026-10-15","notes":"Voir s'ils sont chauds \nMoitié des bénéfices leur reviennent et l'autre moitié pour l'assoc","links":[]},
+    {"id":"msfwf54a92nj","assignees":[],"title":"Contacter proprio prairie à côté","category":"Contact","status":"pasCommence","priority":"moyenne","due":"2026-10-30","notes":"0499622579 — numéro du proprio \n\nLui expliquer que ce serait un gros plus pour l'event en demandant si on peut meme juste avoir un bout de la prairie et pas l'entiertée afin de pouvoir y organiser des actis car nous manquons de place.","links":[]},
+    {"id":"msfwf54apxxi","assignees":[],"title":"Evénement Facebook pour tous","category":"Contact","status":"pasCommence","priority":"moyenne","due":"2026-10-30","notes":"A faire dès qu'on officialise la date, et qu'on a déjà deux trois visuels \nPublier dessus : infos, plans, mobilité, programmes...","links":[]},
+    {"id":"msfwf54ancos","assignees":[],"title":"Commande Naninne & province","category":"Commande","status":"pasCommence","priority":"haute","due":"2026-10-31","notes":"SNJ, truss, scène, audiovisuel\n\nA savoir que tout l'audio et les lights nous avaient été refusée l'année passée\n\nPour la province, a décider cette année si on reprend autant ou si on essaie de faire avec plus de snj pour avoir moins de béton à transporter (pagode et buvette)","links":[{"label":"Commande Naninne de l'année passée","url":"https://drive.google.com/file/d/1hW-63Pps2CqSf_BoSZXeMKeFvXdQ6OSc/view?usp=sharing"},{"label":"Commande province de l'année passée","url":"https://drive.google.com/file/d/1MfDw32o52_yVZpbMb0NrzYs-F9YRPjB7/view?usp=sharing"}]},
+    {"id":"msfwf54a8yjv","assignees":[],"title":"Dire aux chefs d'unité qu'on réserve toutes les tables/bancs des locaux","category":"Matos","status":"pasCommence","priority":"basse","due":"2026-10-31","notes":"","links":[]},
+    {"id":"msfwf54av3pw","assignees":[],"title":"Ecran géant à diffuser","category":"Commande","status":"pasCommence","priority":"basse","due":"2026-11-30","notes":"Recontacter en expliquant qu'on refait et qu'on aimerait repartir sur le meme arrangement à 600 euros \nproxiled, 600€","links":[]},
+    {"id":"msfwf54awdxn","assignees":[],"title":"Prévoir le budget des 10H","category":"Administratif","status":"pasCommence","priority":"haute","due":"2026-11-30","notes":"","links":[{"label":"Compte 2026","url":"https://docs.google.com/spreadsheets/d/1vJbWTAMdn47VWU-6Yjl76U5sRKkLfsogeYh80IazTBQ/edit?usp=sharing"}]},
+    {"id":"msfwf54agyn3","assignees":[],"title":"Commande actis gonflables","category":"Commande","status":"pasCommence","priority":"haute","due":"2026-11-30","notes":"BW-events, 50% réduction","links":[]},
+    {"id":"msfwf54aj4xj","assignees":[],"title":"Commande puces vélos","category":"Commande","status":"pasCommence","priority":"haute","due":"2026-11-30","notes":"À aller chercher 1 semaine avant\nDemander à ferrilata le contact","links":[]},
+    {"id":"msfwf54a4h34","assignees":[],"title":"Affiche sponsors","category":"Contact","status":"pasCommence","priority":"basse","due":"2026-11-30","notes":"Canva : https://canva.link/y5fr5nq2ftz7db5","links":[{"label":"canva 2027 à éditer","url":"https://canva.link/y5fr5nq2ftz7db5"}]},
+    {"id":"msfwf54amvoj","assignees":[],"title":"Affiche programme","category":"Contact","status":"pasCommence","priority":"basse","due":"2026-11-30","notes":"Canva : https://www.canva.com/design/DAG12T0jWTs/ff2nrFJbp1yLYVxsx-DIwA/edit","links":[{"label":"canva 2027 à éditer","url":"https://canva.link/y5fr5nq2ftz7db5"}]},
+    {"id":"msfwf54auxm5","assignees":[],"title":"Affiche plan du site","category":"Contact","status":"pasCommence","priority":"basse","due":"2026-11-30","notes":"Canva : https://www.canva.com/design/DAG12T0jWTs/ff2nrFJbp1yLYVxsx-DIwA/edit","links":[{"label":"canva 2027 à éditer","url":"https://canva.link/y5fr5nq2ftz7db5"}]},
+    {"id":"msfwf54alzut","assignees":[],"title":"Affiche mobilité","category":"Contact","status":"pasCommence","priority":"basse","due":"2026-11-30","notes":"Canva : https://www.canva.com/design/DAG12T0jWTs/ff2nrFJbp1yLYVxsx-DIwA/edit","links":[{"label":"canva 2027 à éditer","url":"https://canva.link/y5fr5nq2ftz7db5"}]},
+    {"id":"msfwf54au6lw","assignees":[],"title":"Trouver et contacter une association","category":"Contact","status":"pasCommence","priority":"moyenne","due":"2026-12-31","notes":"Trouver une association (sportive c'est toujours un plus)","links":[]},
+    {"id":"msfwf54aerul","assignees":[],"title":"Camion commune pour Province","category":"Contact","status":"pasCommence","priority":"basse","due":"2026-12-31","notes":"Tenter de négocier un trajet pour la scène","links":[]},
+    {"id":"msfwf54afbus","assignees":[],"title":"Contacter Thylo pour refaire des coupes","category":"Matos","status":"pasCommence","priority":"basse","due":"2027-01-31","notes":"","links":[]},
+    {"id":"msfwf54a0fbf","assignees":[],"title":"René Matty : podium + brassard + panneau signaleur","category":"Contact","status":"pasCommence","priority":"basse","due":"2027-02-15","notes":"0470585955. Confirmer une première fois au téléphone et ensuite normalement à recontacter dans la semaine des 10h pour aller chercher","links":[]},
+    {"id":"msfwf54a2884","assignees":[],"title":"Mail parents + WhatsApp + Insta","category":"Contact","status":"pasCommence","priority":"basse","due":"2027-02-20","notes":"Faire un mail aux parents avec les infos pour le jour j + communiquer sur les comptes instas","links":[]},
+    {"id":"msfwf54a7c1t","assignees":[],"title":"Trouver un DJ","category":"Commande","status":"pasCommence","priority":"basse","due":"2027-02-20","notes":"Diego Lederer, Ytar, Nicolas Dandois, phonetix","links":[]},
+    {"id":"msfwf54aoywb","assignees":[],"title":"Programme, actis, concerts","category":"Contact","status":"pasCommence","priority":"basse","due":"2027-02-27","notes":"Définir le programme des actis: \n\nConcours de flan, 2 châteaux gonflables, bungee run, jeux en bois, tournoi spike, coca mécanique.","links":[{"label":"Programme de l'année passée","url":"https://drive.google.com/file/d/1Pn8iebtbaga5k2fAF3uPFMGfnTJ5Pyjg/view?usp=sharing"}]},
+    {"id":"msfwf54aef78","assignees":[],"title":"Groupe Facebook avec autres chefs","category":"Administratif","status":"pasCommence","priority":"basse","due":"2027-02-28","notes":"Rassembler tous les membres des staffs sur un groupe messenger et qui sera le canal principal pour communiquer \n\nCc la team !\nBienvenue dans le groupe qui nous aidera à assurer la communication et le bon déroulement du plus grand événement de l'année, aka les 10h de Nil !\nMerci d'ajouter chaque personne de vos staffs respectifs.\nOn se dit à très vite dans le plus beau village de Wallonie ! Le staff phœnix 💙💚","links":[]},
+    {"id":"msfwf54azraq","assignees":[],"title":"Affiche Kiss & drive","category":"Contact","status":"pasCommence","priority":"basse","due":"2027-02-28","notes":"Canva : https://www.canva.com/design/DAG12T0jWTs/ff2nrFJbp1yLYVxsx-DIwA/edit","links":[{"label":"canva 2027 à éditer","url":"https://canva.link/y5fr5nq2ftz7db5"}]},
+    {"id":"msfwf54atjw6","assignees":[],"title":"Trailer vidéo","category":"Contact","status":"pasCommence","priority":"basse","due":"2027-03-01","notes":"Trailer vidéo à faire pour chauffer l'édition de cette année.","links":[{"label":"Trailer de l'année passé","url":"https://youtu.be/0tzBvqSouaQ?si=orNJZ-7mMMg0tPo2"}]},
+    {"id":"msfwf54azmgy","assignees":[],"title":"Préparer mots voisins","category":"Administratif","status":"pasCommence","priority":"basse","due":"2027-03-15","notes":"Mots voisins","links":[{"label":"Mot voisin 2026","url":"https://docs.google.com/document/d/1SRbaPsUvUgzu4ZOpGZcCDXgGKFLvzKf8INkWvVDXGD4/edit?usp=sharing"}]},
+    {"id":"msfwf54amx1m","assignees":[],"title":"Imprimer mots voisins","category":"Administratif","status":"pasCommence","priority":"basse","due":"2027-03-15","notes":"imprimer (2 pages par feuille, noir et blanc, 100x) Mots voisins","links":[{"label":"Mot voisin 2027","url":"à mettre"}]},
+    {"id":"msfwf54aiz9t","assignees":[],"title":"Contact d'urgence : médecin,...","category":"Contact","status":"pasCommence","priority":"basse","due":"2027-03-16","notes":"0456 57 01 41 — Benoit Brasseur, ok","links":[]},
+    {"id":"msfwf54ayk6i","assignees":[],"title":"Commande au Colruyt de Flans (300 flans)","category":"Commande","status":"pasCommence","priority":"basse","due":"2027-03-20","notes":"Début prévu : 25/03/2026. Quantité ? 300 à commander pour le jeudi/vendredi, 2 semaines à l'avance\n\nAttention bien dire 75 X 4 flans et non 300 X 4 flans","links":[]},
+    {"id":"msfwf54auk7e","assignees":[],"title":"Planning des RDV avant","category":"Commande","status":"pasCommence","priority":"basse","due":"2027-03-20","notes":"Planning d'organisation de la semaine avant - à définir selon les besoins et à rajouter en taches ici","links":[{"label":"Planning 2026","url":"https://docs.google.com/spreadsheets/d/1veNzbA9Ld6OXro9o3tvbWtxpcQuaX04vD7LmCr0g7Gk/edit?usp=sharing"}]},
+    {"id":"msfwf54as7f9","assignees":[],"title":"Préparer liste matos","category":"Administratif","status":"pasCommence","priority":"basse","due":"2027-03-28","notes":"s'assurer de tous le matos dont nous avons besoin pendant l'event + s'assurer qu'on l'a pour le jour j","links":[{"label":"Matos année passée","url":"https://docs.google.com/spreadsheets/d/17hrL4BK2GKmem5m_Js6o1D_KUVXLmQlSGgZqDEmb-10/edit?usp=sharing"}]},
+    {"id":"msfwf54ap4vn","assignees":[],"title":"Responsable signaleurs - planning","category":"Administratif","status":"pasCommence","priority":"moyenne","due":"2027-03-28","notes":"Faire un sheet partagé dans lequel les troupes et parents peuvent s'inscrire pour des shifts de 2H \n\nS'assurer que tout soit full, si pas le cas on attribuera aux staffs sans leur avis.","links":[{"label":"sheet de l'année passé","url":"https://docs.google.com/spreadsheets/d/1dpjKaSDOglehi5LM0MGSgUiuDG3gygYBNfN6TfS1CbE/edit?usp=sharing"}]},
+    {"id":"msfwf54ag3ai","assignees":[],"title":"Installation scénique","category":"Commande","status":"pasCommence","priority":"basse","due":"2027-03-29","notes":"DJ events ou nous selon si on a eu ce qu'on voulait pour naninne","links":[]},
+    {"id":"msfwf54a3tka","assignees":[],"title":"Faire une urne pour les dons","category":"Matos","status":"pasCommence","priority":"basse","due":"2027-03-30","notes":"","links":[]},
+    {"id":"msfwf54anl86","assignees":[],"title":"Préparer tombola","category":"Matos","status":"pasCommence","priority":"basse","due":"2027-03-30","notes":"Tickets de tombola en double, fonds de caisse + caisse","links":[]},
+    {"id":"msfwf54ah2c7","assignees":[],"title":"Impression des A0","category":"Administratif","status":"pasCommence","priority":"basse","due":"2027-03-30","notes":"Imprimer les affiches","links":[]},
+    {"id":"msfwf54azhy5","assignees":[],"title":"Répartition des tâches staffs pdt l'évent","category":"Administratif","status":"pasCommence","priority":"basse","due":"2027-03-30","notes":"Faire le sheet de répartition.","links":[{"label":"Rôle 2026","url":"https://docs.google.com/spreadsheets/d/1Wlx3HGLYFVVyVDobFwCHkrP3bmQCb-RS08u3nGhxmQg/edit?usp=sharing"}]},
+    {"id":"msfwf54a7ckj","assignees":[],"title":"Impression des documents","category":"Administratif","status":"pasCommence","priority":"basse","due":"2027-03-30","notes":"Voir drive à imprimer","links":[]},
+    {"id":"msfwf54aspq7","assignees":[],"title":"sumup","category":"Administratif","status":"pasCommence","priority":"basse","due":"2027-03-30","notes":"on est chaud pour deux en collab avec les chefs d'u - normalement demander aux chefs d'u","links":[]},
+    {"id":"msfwf54aix6q","assignees":[],"title":"Faire affiches des lieux QG, Phoenix, toilettes,...","category":"Matos","status":"pasCommence","priority":"basse","due":"2027-03-30","notes":"peut se faire au bic aussi","links":[]},
+    {"id":"msfwf54a6827","assignees":[],"title":"Prix pour les gagnants","category":"Matos","status":"pasCommence","priority":"basse","due":"2027-03-30","notes":"budget: viser 200 euros pour 3 lots\nChouette pour une troupe","links":[]},
+    {"id":"msfwf54aaykq","assignees":[],"title":"Trouver 2 VTT pour la Phoenix + matos réparation","category":"Matos","status":"pasCommence","priority":"basse","due":"2027-03-31","notes":"","links":[]},
+    {"id":"msfwf54a8ggj","assignees":[],"title":"Contacter sponsors","category":"Sponsors","status":"pasCommence","priority":"moyenne","due":"2027-04-01","notes":"Liste de sponsors 2026","links":[{"label":"Liste sponsor 2026","url":"https://docs.google.com/spreadsheets/d/1m2l2v5tkwfykljJOPKe__iqRBn8N2tdL8UYK1kqO0Tg/edit?usp=sharing"}]}
+  ],
+  "budget": [],
+  "budgetLink": "https://docs.google.com/spreadsheets/d/1vJbWTAMdn47VWU-6Yjl76U5sRKkLfsogeYh80IazTBQ/edit?usp=sharing",
+  "participants": [],
+  "milestones": [],
+  "messages": [],
+  "importedV1": true,
+  "resetStatusV1": true,
+  "resetStatusV2": true
+};
+
+let currentView = 'tasks';
+let planningViewMode = 'list';
+let calendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+let selectedDay = null;
+let planningAssigneeFilter = new Set();
+let currentUserName = null;
+let taskFilter = 'all';
+let taskAssigneeFilter = new Set();
+let taskPriorityFilter = new Set();
+let taskStatusFilter = new Set();
+let taskSearchQuery = '';
+let editingTaskId = null;
+let pendingEditTaskId = null;
+let unlockedViews = new Set();
+const PROTECTED_VIEWS = { staff: 'Staff & Inscriptions' };
+const APP_PASSWORD = 'pomponette';
+let uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+function rearmModalButtons(){
+  const confirmBtn = document.getElementById('modalConfirm');
+  const cancelBtn = document.getElementById('modalCancel');
+  const newConfirm = confirmBtn.cloneNode(true); confirmBtn.replaceWith(newConfirm);
+  const newCancel = cancelBtn.cloneNode(true); cancelBtn.replaceWith(newCancel);
+  newCancel.textContent = 'Annuler';
+  newCancel.addEventListener('click', closeModal);
+  return newConfirm;
+}
+function showConfirmModal(title, message, onConfirm){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = `<p style="margin:0;">${esc(message)}</p>`;
+  const confirmBtn = rearmModalButtons();
+  confirmBtn.textContent = 'Confirmer';
+  confirmBtn.addEventListener('click', ()=>{ closeModal(); onConfirm(); });
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function showPromptModal(title, defaultValue, inputType, onSubmit){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = `<input type="${inputType}" id="modalInput" value="${esc(defaultValue||'')}">`;
+  const confirmBtn = rearmModalButtons();
+  confirmBtn.textContent = 'Valider';
+  confirmBtn.addEventListener('click', ()=>{
+    const val = document.getElementById('modalInput').value;
+    closeModal(); onSubmit(val);
+  });
+  document.getElementById('modalOverlay').classList.add('show');
+  setTimeout(()=>document.getElementById('modalInput')?.focus(), 50);
+}
+document.getElementById('modalOverlay').addEventListener('click', (e)=>{
+  if(e.target.id==='modalOverlay') closeModal();
+});
+
+const DEFAULT_SHAPE = { eventDate: '', staff: [], tasks: [], budget: [], budgetLink: '', participants: [], milestones: [], messages: [] };
+
+async function fetchRemoteData(){
+  const res = await fetch(APPS_SCRIPT_URL, { method: 'GET' });
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  const json = await res.json();
+  return (json && typeof json === 'object') ? json : {};
+}
+
+async function pushRemoteData(){
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // évite le preflight CORS
+    body: JSON.stringify(data)
+  });
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  const json = await res.json();
+  if(!json || json.ok !== true) throw new Error('Réponse inattendue du serveur');
+}
+
+async function loadData(){
+  try{
+    const parsed = await fetchRemoteData();
+    if(parsed && Object.keys(parsed).length){
+      data = Object.assign(data, parsed);
+    }
+  }catch(e){
+    console.log('Aucune donnée distante trouvée (ou hors ligne), utilisation des données de base.', e);
+  }
+  render();
+}
+
+async function refreshData(){
+  const btn = document.getElementById('refreshBtn');
+  btn?.classList.add('spinning');
+  try{
+    const parsed = await fetchRemoteData();
+    if(parsed && Object.keys(parsed).length){
+      data = Object.assign({}, DEFAULT_SHAPE, parsed);
+      showToast('Données actualisées');
+    } else {
+      showToast('Aucune donnée distante pour le moment');
+    }
+  }catch(e){
+    console.error('Refresh error', e);
+    showToast("Impossible d'actualiser (vérifie ta connexion)");
+  }
+  renderHeader(); renderView();
+  setTimeout(()=>btn?.classList.remove('spinning'), 650);
+}
+
+async function saveData(){
+  try{
+    await pushRemoteData();
+  }catch(e){
+    console.error('Storage error', e);
+    showToast("Erreur d'enregistrement (vérifie ta connexion)");
+  }
+}
+
+const USERNAME_KEY = 'nsv10h-username';
+function ensureUserName(cb){
+  if(currentUserName){ cb(currentUserName); return; }
+  try{
+    const saved = localStorage.getItem(USERNAME_KEY);
+    if(saved){ currentUserName = saved; cb(currentUserName); return; }
+  }catch(e){ /* stockage local indisponible */ }
+  showPromptModal('Comment tu t\u2019appelles ?', '', 'text', (val)=>{
+    const name = (val||'').trim();
+    if(!name){ showToast('Un prénom est nécessaire pour discuter'); return; }
+    currentUserName = name;
+    try{ localStorage.setItem(USERNAME_KEY, name); }catch(e){ /* stockage local indisponible */ }
+    cb(name);
+  });
+}
+
+/* ---------------- HEADER / RING ---------------- */
+function renderHeader(){
+  const btn = document.getElementById('dateEditBtn');
+  const ring = document.getElementById('ringProgress');
+  const num = document.getElementById('ringNum');
+  const label = document.getElementById('ringLabel');
+
+  if(!data.eventDate){
+    btn.textContent = "définir la date de l'événement";
+    num.textContent = '--';
+    label.textContent = 'DATE ?';
+    ring.style.strokeDashoffset = 264;
+  } else {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const ev = new Date(data.eventDate); ev.setHours(0,0,0,0);
+    const diffDays = Math.round((ev - today) / 86400000);
+    btn.textContent = new Date(data.eventDate).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}) + ' · modifier';
+    if(diffDays >= 0){
+      num.textContent = 'J-' + diffDays;
+      label.textContent = diffDays === 0 ? "C'EST AUJOURD'HUI" : 'AVANT L\'ÉVÉNEMENT';
+      const pct = Math.max(0, Math.min(1, 1 - diffDays/90));
+      ring.style.strokeDashoffset = 264 - (264*pct);
+    } else {
+      num.textContent = '✓';
+      label.textContent = 'ÉVÉNEMENT PASSÉ';
+      ring.style.strokeDashoffset = 0;
+    }
+  }
+
+  const doneT = data.tasks.filter(t=>t.status==='termine').length;
+  document.getElementById('statTasks').textContent = doneT + '/' + data.tasks.length;
+
+  document.getElementById('statParticipants').textContent = data.participants.length;
+}
+
+document.getElementById('dateEditBtn').addEventListener('click', ()=>{
+  showPromptModal("Date de l'événement", data.eventDate || '', 'date', (val)=>{
+    data.eventDate = val;
+    saveData(); renderHeader();
+    showToast('Date mise à jour');
+  });
+});
+
+/* ---------------- NAV ---------------- */
+document.getElementById('nav').addEventListener('click', (e)=>{
+  const btn = e.target.closest('.nav-btn');
+  if(!btn) return;
+  currentView = btn.dataset.view;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b===btn));
+  document.getElementById('settingsBtn')?.classList.remove('active');
+  renderView();
+});
+
+document.getElementById('settingsBtn').addEventListener('click', ()=>{
+  currentView = 'staff';
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('settingsBtn').classList.add('active');
+  renderView();
+});
+
+document.getElementById('refreshBtn').addEventListener('click', refreshData);
+
+function render(){
+  renderHeader();
+  renderView();
+}
+
+function viewLocked(label){
+  return `
+    <div class="view">
+      <div class="empty" style="padding:50px 20px 30px;">
+        <b>🔒 Accès restreint</b>
+        Tu n'as pas accès à la catégorie "${esc(label)}" sauf si tu as le mot de passe.
+      </div>
+      <div class="form-panel" style="max-width:320px;margin:0 auto;grid-template-columns:1fr;">
+        <div class="field"><label>Mot de passe</label><input type="password" id="lockPassword" placeholder="Mot de passe"></div>
+        <div class="form-actions" style="justify-content:center;">
+          <button class="btn lime" id="unlockBtn">Déverrouiller</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function openTaskEditor(id){
+  const t = data.tasks.find(x=>x.id===id);
+  if(!t) return;
+  editingTaskId = t.id;
+  document.getElementById('taskFormLabel').textContent = 'Modifier : ' + t.title;
+  document.getElementById('tTitle').value = t.title;
+  document.getElementById('tCat').value = t.category;
+  document.getElementById('tDue').value = t.due || '';
+  document.getElementById('tStatus').value = t.status;
+  document.getElementById('tPrio').value = t.priority;
+  document.getElementById('tNotes').value = t.notes || '';
+  document.getElementById('tLinks').value = formatLinks(t.links);
+  document.querySelectorAll('#tAssigneeChips .chip[data-assignee-chip]').forEach(ch=>{
+    ch.classList.toggle('active', (t.assignees||[]).includes(ch.dataset.assigneeChip));
+  });
+  document.getElementById('saveTask').textContent = 'Mettre à jour';
+  const form = document.getElementById('taskForm');
+  form.classList.remove('hidden');
+  form.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function tryUnlock(){
+  const input = document.getElementById('lockPassword');
+  if(!input) return;
+  if(input.value === APP_PASSWORD){
+    unlockedViews.add(currentView);
+    showToast('Accès autorisé');
+    renderView();
+  } else {
+    showToast('Mot de passe incorrect');
+  }
+}
+
+function renderView(){
+  const c = document.getElementById('viewContainer');
+  if(PROTECTED_VIEWS[currentView] && !unlockedViews.has(currentView)){
+    c.innerHTML = viewLocked(PROTECTED_VIEWS[currentView]);
+    document.getElementById('unlockBtn')?.addEventListener('click', tryUnlock);
+    document.getElementById('lockPassword')?.addEventListener('keydown', (e)=>{ if(e.key==='Enter') tryUnlock(); });
+    document.getElementById('lockPassword')?.focus();
+    return;
+  }
+  if(currentView==='staff') c.innerHTML = viewStaff();
+  else if(currentView==='tasks') c.innerHTML = viewTasks();
+  else if(currentView==='planning') c.innerHTML = viewPlanning();
+  else if(currentView==='discussion') c.innerHTML = viewDiscussion();
+  attachViewHandlers();
+}
+
+/* ---------------- STAFF ---------------- */
+function viewStaff(){
+  const taskCount = (name) => data.tasks.filter(t=>(t.assignees||[]).includes(name)).length;
+  const doneCount = (name) => data.tasks.filter(t=>(t.assignees||[]).includes(name) && t.status==='termine').length;
+
+  return `
+    <div class="view">
+      <div class="view-head">
+        <div>
+          <div class="view-title">Équipe de staff</div>
+          <div class="view-sub">Configure d'abord ici les personnes à qui tu pourras assigner des tâches.</div>
+        </div>
+      </div>
+
+      <div class="form-panel" style="grid-template-columns:1fr auto;">
+        <div class="field"><label>Nom du membre</label><input id="newStaffInput" placeholder="Ex : Julie"></div>
+        <div class="form-actions" style="margin-top:0;align-self:end;">
+          <button class="btn lime" id="addStaffBtn">+ Ajouter au staff</button>
+        </div>
+      </div>
+
+      ${data.staff.length===0 ? `<div class="empty"><b>Aucun membre pour l'instant</b>Ajoute les personnes de l'équipe avant de créer des tâches.</div>` : `
+      <table class="table">
+        <thead><tr><th>Nom</th><th>Tâches assignées</th><th>Terminées</th><th></th></tr></thead>
+        <tbody>
+        ${data.staff.map(s=>`
+          <tr>
+            <td><strong>${esc(s)}</strong></td>
+            <td class="num">${taskCount(s)}</td>
+            <td class="num">${doneCount(s)}</td>
+            <td><button class="del-btn" data-remove-staff="${esc(s)}">🗑</button></td>
+          </tr>
+        `).join('')}
+        </tbody>
+      </table>`}
+
+      <div class="view-head" style="margin-top:32px;border-top:1px solid var(--line);padding-top:22px;">
+        <div>
+          <div class="view-title">Budget</div>
+          <div class="view-sub">Lien vers le document externe qui gère les comptes (Google Sheet, Excel en ligne...)</div>
+        </div>
+      </div>
+
+      <div class="form-panel" style="grid-template-columns:1fr auto;">
+        <div class="field"><label>Lien du document</label><input id="budgetLinkInput" placeholder="https://docs.google.com/spreadsheets/..." value="${esc(data.budgetLink||'')}"></div>
+        <div class="form-actions" style="margin-top:0;align-self:end;">
+          <button class="btn lime" id="saveBudgetLink">Enregistrer</button>
+        </div>
+      </div>
+
+      ${data.budgetLink ? `<a href="${esc(data.budgetLink)}" target="_blank" rel="noopener" class="btn lime" style="text-decoration:none;display:inline-block;">📊 Ouvrir le document budget</a>` : `<div class="empty"><b>Aucun lien enregistré</b>Colle le lien vers ton document de suivi budgétaire ci-dessus.</div>`}
+
+      <div class="view-head" style="margin-top:32px;border-top:1px solid var(--line);padding-top:22px;">
+        <div>
+          <div class="view-title">Inscriptions</div>
+          <div class="view-sub">${data.participants.length} équipe(s) inscrite(s)</div>
+        </div>
+        <button class="btn lime" id="toggleParticipantForm">+ Nouvelle équipe</button>
+      </div>
+
+      <div class="form-panel hidden" id="participantForm">
+        <div class="field"><label>Nom de l'équipe</label><input id="pTeam" placeholder="Ex : Les Mollets d'Acier"></div>
+        <div class="field"><label>Contact</label><input id="pContact" placeholder="Nom, email ou téléphone"></div>
+        <div class="field"><label>Tours prévus</label><input type="number" id="pLaps" placeholder="Optionnel"></div>
+        <div class="field"><label>Paiement</label><select id="pPaid"><option value="non">Non payé</option><option value="oui">Payé</option></select></div>
+        <div class="form-actions">
+          <button class="btn ghost" id="cancelParticipant">Annuler</button>
+          <button class="btn lime" id="saveParticipant">Enregistrer</button>
+        </div>
+      </div>
+
+      ${data.participants.length===0 ? `<div class="empty"><b>Pas encore d'inscriptions</b>Ajoute la première équipe.</div>` : `
+      <table class="table">
+        <thead><tr><th>Équipe</th><th>Contact</th><th>Tours prévus</th><th>Paiement</th><th></th></tr></thead>
+        <tbody>
+        ${data.participants.map(p=>`
+          <tr>
+            <td><strong>${esc(p.team)}</strong></td>
+            <td>${esc(p.contact||'—')}</td>
+            <td>${p.laps || '—'}</td>
+            <td>${p.paid==='oui' ? '<span class="row-recette">Payé</span>' : '<span class="row-depense">Non payé</span>'}</td>
+            <td><button class="del-btn" data-del-participant="${p.id}">🗑</button></td>
+          </tr>
+        `).join('')}
+        </tbody>
+      </table>`}
+
+      <div class="view-head" style="margin-top:32px;border-top:1px solid var(--line);padding-top:22px;">
+        <div>
+          <div class="view-title">Sauvegarde</div>
+          <div class="view-sub">Exporte toutes les données (staff, tâches, planning, budget, inscriptions) en copie de secours, ou réimporte une sauvegarde.</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+        <button class="btn lime" id="toggleExportPanel">📤 Exporter les données</button>
+        <button class="btn ghost" id="toggleImportPanel">📥 Importer une sauvegarde</button>
+      </div>
+
+      <div class="form-panel hidden" id="exportPanel" style="grid-template-columns:1fr;">
+        <div class="field"><label>Copie de secours (texte à conserver)</label><textarea id="exportOutput" readonly style="min-height:160px;font-family:ui-monospace,monospace;font-size:11px;"></textarea></div>
+        <div class="form-actions">
+          <button class="btn ghost" id="copyExportBtn">Copier</button>
+          <button class="btn ghost" id="closeExportPanel">Fermer</button>
+        </div>
+      </div>
+
+      <div class="form-panel hidden" id="importPanel" style="grid-template-columns:1fr;">
+        <div class="field"><label>Coller ici une sauvegarde exportée précédemment</label><textarea id="importInput" placeholder="Colle le texte exporté précédemment" style="min-height:160px;font-family:ui-monospace,monospace;font-size:11px;"></textarea></div>
+        <div class="form-actions">
+          <button class="btn ghost" id="cancelImport">Annuler</button>
+          <button class="btn lime" id="confirmImport">Importer (remplace tout)</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ---------------- TASKS ---------------- */
+const CATEGORIES = ['Administratif','Commande','Contact','Matos','Sponsors'];
+const STATUSES = [
+  {key:'pasCommence', label:'Pas commencé'},
+  {key:'enCours', label:'En cours'},
+  {key:'bloque', label:'Bloqué'},
+  {key:'termine', label:'Terminé'}
+];
+const PRIORITIES = [
+  {key:'urgent', label:'1 Urgent'},
+  {key:'haute', label:'2 Haute'},
+  {key:'moyenne', label:'3 Moyenne'},
+  {key:'basse', label:'4 Basse'},
+  {key:'termine', label:'5 Terminé'}
+];
+function statusLabel(key){ return (STATUSES.find(s=>s.key===key)||{}).label || key; }
+function prioLabel(key){ return (PRIORITIES.find(p=>p.key===key)||{}).label || key; }
+function parseLinks(text){
+  return (text||'').split('\n').map(l=>l.trim()).filter(Boolean).map(line=>{
+    const sepIndex = line.indexOf(' - ');
+    let label, url;
+    if(sepIndex !== -1){
+      label = line.slice(0, sepIndex).trim();
+      url = line.slice(sepIndex + 3).trim();
+    } else {
+      url = line;
+      try{ label = new URL(url).hostname.replace('www.',''); }catch(e){ label = url; }
+    }
+    return {label, url};
+  }).filter(l=>l.url);
+}
+function formatLinks(links){
+  return (links||[]).map(l=> l.label && l.label!==l.url ? `${l.label} - ${l.url}` : l.url).join('\n');
+}
+
+function viewTasks(){
+  let filtered = taskFilter==='all' ? data.tasks : data.tasks.filter(t=>t.category===taskFilter);
+  if(taskAssigneeFilter.size>0){
+    filtered = filtered.filter(t=>{
+      const assignees = (t.assignees && t.assignees.length) ? t.assignees : ['__none__'];
+      return assignees.some(a=>taskAssigneeFilter.has(a));
+    });
+  }
+  if(taskPriorityFilter.size>0){
+    filtered = filtered.filter(t=> taskPriorityFilter.has(t.priority));
+  }
+  if(taskStatusFilter.size>0){
+    filtered = filtered.filter(t=> taskStatusFilter.has(t.status));
+  }
+  if(taskSearchQuery.trim()){
+    const q = taskSearchQuery.trim().toLowerCase();
+    filtered = filtered.filter(t=> t.title.toLowerCase().includes(q));
+  }
+  const catOptions = CATEGORIES.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  const statusOptions = STATUSES.map(s=>`<option value="${s.key}">${esc(s.label)}</option>`).join('');
+  const prioOptions = PRIORITIES.map(p=>`<option value="${p.key}">${esc(p.label)}</option>`).join('');
+  const today = new Date().toISOString().slice(0,10);
+
+  return `
+    <div class="view">
+      <div class="view-head">
+        <div>
+          <div class="view-title">Tâches de préparation</div>
+          <div class="view-sub">${data.tasks.length} tâche(s) · ${data.tasks.filter(t=>t.status==='termine').length} terminée(s)</div>
+        </div>
+        <button class="btn lime" id="toggleTaskForm">+ Nouvelle tâche</button>
+      </div>
+
+      <div class="form-panel hidden" id="taskForm">
+        <div class="field" style="grid-column:1/-1"><label id="taskFormLabel">Titre</label><input id="tTitle" placeholder="Ex : Réserver les barrières"></div>
+        <div class="field"><label>Catégorie</label><select id="tCat">${catOptions}</select></div>
+        <div class="field"><label>Échéance</label><input type="date" id="tDue"></div>
+        <div class="field"><label>Statut</label><select id="tStatus">${statusOptions}</select></div>
+        <div class="field"><label>Priorité</label><select id="tPrio">${prioOptions}</select></div>
+        <div class="field" style="grid-column:1/-1">
+          <label>Responsable(s)</label>
+          <div class="chips" id="tAssigneeChips" style="margin-bottom:0;">
+            ${data.staff.map(s=>`<div class="chip person" data-assignee-chip="${esc(s)}">${esc(s)}</div>`).join('')}
+            ${data.staff.length===0 ? `<span style="font-size:12px;color:var(--lime-dim);">Ajoute d'abord des membres dans l'onglet Staff</span>` : ''}
+          </div>
+        </div>
+        <div class="field" style="grid-column:1/-1"><label>Notes</label><textarea id="tNotes" placeholder="Optionnel"></textarea></div>
+        <div class="field" style="grid-column:1/-1"><label>Documents (liens)</label><textarea id="tLinks" placeholder="Un lien par ligne. Optionnel : Nom du doc - https://..."></textarea></div>
+        <div class="form-actions">
+          <button class="btn ghost" id="cancelTask">Annuler</button>
+          <button class="btn lime" id="saveTask">Enregistrer</button>
+        </div>
+      </div>
+
+      <div style="position:relative;margin-bottom:14px;">
+        <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:0.5;font-size:13px;pointer-events:none;">🔍</span>
+        <input id="taskSearchInput" value="${esc(taskSearchQuery)}" placeholder="Rechercher une tâche par titre..." style="width:100%;padding:11px 12px 11px 34px;border:1px solid var(--line);border-radius:20px;font-size:16px;font-family:inherit;background:#fff;color:var(--ink);">
+      </div>
+
+      <div class="chips">
+        <div class="chip ${taskFilter==='all'?'active':''}" data-filter="all">Toutes</div>
+        ${CATEGORIES.map(c=>`<div class="chip ${taskFilter===c?'active':''}" data-filter="${esc(c)}">${esc(c)}</div>`).join('')}
+      </div>
+
+      <div class="chips">
+        <span style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;align-self:center;">Responsable(s) :</span>
+        ${data.staff.map(s=>`<div class="chip person ${taskAssigneeFilter.has(s)?'active':''}" data-person="${esc(s)}">${esc(s)}</div>`).join('')}
+        <div class="chip person ${taskAssigneeFilter.has('__none__')?'active':''}" data-person="__none__">Non assigné</div>
+        ${taskAssigneeFilter.size>0 ? `<div class="chip ghost" id="clearPersonFilter" style="cursor:pointer;">✕ Effacer</div>` : ''}
+      </div>
+
+      <div class="chips">
+        <span style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;align-self:center;">Priorité :</span>
+        ${PRIORITIES.map(p=>`<div class="chip person ${taskPriorityFilter.has(p.key)?'active':''}" data-prio="${p.key}">${esc(p.label)}</div>`).join('')}
+        ${taskPriorityFilter.size>0 ? `<div class="chip ghost" id="clearPrioFilter" style="cursor:pointer;">✕ Effacer</div>` : ''}
+      </div>
+
+      <div class="chips">
+        <span style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;align-self:center;">État :</span>
+        ${STATUSES.map(s=>`<div class="chip person ${taskStatusFilter.has(s.key)?'active':''}" data-status-filter="${s.key}">${esc(s.label)}</div>`).join('')}
+        ${taskStatusFilter.size>0 ? `<div class="chip ghost" id="clearStatusFilter" style="cursor:pointer;">✕ Effacer</div>` : ''}
+      </div>
+
+      ${filtered.length===0 ? `<div class="empty"><b>Rien ici pour l'instant</b>Ajoute la première tâche de cette catégorie.</div>` :
+        filtered.sort((a,b)=> (a.status==='termine')-(b.status==='termine') || (a.due||'9999').localeCompare(b.due||'9999'))
+        .map(t=>{
+          const overdue = t.due && t.due < today && t.status!=='termine';
+          return `
+        <div class="card ${t.status==='termine'?'done':''}">
+          <select class="status-select" data-status="${t.id}" style="${statusStyle(t.status)}">
+            ${STATUSES.map(s=>`<option value="${s.key}" ${t.status===s.key?'selected':''}>${esc(s.label)}</option>`).join('')}
+          </select>
+          <div class="card-body">
+            <div class="card-title ${t.status==='termine'?'strike':''}"><span class="${overdue?'highlight':''}">${esc(t.title)}</span>${overdue?' <span class="warn-icon" title="Échéance dépassée">⚠️</span>':''}</div>
+            <div class="card-meta">
+              <span class="tag cat">${esc(t.category)}</span>
+              <span class="tag prio-${t.priority}">${esc(prioLabel(t.priority))}</span>
+              ${t.assignees && t.assignees.length?`<span>👤 ${t.assignees.map(a=>esc(a)).join(', ')}</span>`:''}
+              ${t.due?`<span>📅 ${new Date(t.due).toLocaleDateString('fr-FR')}</span>`:''}
+            </div>
+            ${t.notes?`<div style="font-size:12px;color:var(--muted);margin-top:6px;">${esc(t.notes)}</div>`:''}
+            ${t.links && t.links.length ? `<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;">${t.links.map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener" class="tag cat" style="text-decoration:none;">📎 ${esc(l.label)}</a>`).join('')}</div>` : ''}
+          </div>
+          <div class="card-actions">
+            <button class="del-btn" data-edit="${t.id}" title="Modifier">✎</button>
+            <button class="del-btn" data-del="${t.id}" title="Supprimer">🗑</button>
+          </div>
+        </div>
+      `;}).join('')}
+    </div>
+  `;
+}
+function statusStyle(key){
+  const map = {
+    pasCommence: 'background:var(--paper-2);color:var(--muted);',
+    enCours: 'background:#e2d5b8;color:var(--forest);',
+    bloque: 'background:#f0dde0;color:var(--alert);',
+    termine: 'background:var(--forest);color:var(--paper);'
+  };
+  return (map[key]||'') + 'border:none;border-radius:20px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.03em;padding:5px 8px;flex-shrink:0;cursor:pointer;';
+}
+
+/* ---------------- PLANNING ---------------- */
+function groupByDate(sortedItems){
+  const groups = [];
+  let lastDate = undefined;
+  sortedItems.forEach(item=>{
+    const d = item.date || '';
+    if(d !== lastDate){
+      groups.push({date: d, items: [item]});
+      lastDate = d;
+    } else {
+      groups[groups.length-1].items.push(item);
+    }
+  });
+  return groups;
+}
+
+function planningFilteredTasks(){
+  let tasks = data.tasks.filter(t=>t.due);
+  if(planningAssigneeFilter.size>0){
+    tasks = tasks.filter(t=>{
+      const assignees = (t.assignees && t.assignees.length) ? t.assignees : ['__none__'];
+      return assignees.some(a=>planningAssigneeFilter.has(a));
+    });
+  }
+  return tasks;
+}
+
+function viewPlanning(){
+  const filteredTaskCount = planningFilteredTasks().length;
+  return `
+    <div class="view">
+      <div class="view-head">
+        <div>
+          <div class="view-title">Rétroplanning</div>
+          <div class="view-sub">${data.milestones.length} étape(s) clé(s) · ${filteredTaskCount} tâche(s) avec échéance${planningAssigneeFilter.size>0?' (filtré)':''}</div>
+        </div>
+        <div class="chips">
+          <div class="chip ${planningViewMode==='list'?'active':''}" data-planning-mode="list">📋 Liste</div>
+          <div class="chip ${planningViewMode==='calendar'?'active':''}" data-planning-mode="calendar">🗓 Calendrier</div>
+        </div>
+      </div>
+
+      <div class="chips">
+        <span style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;align-self:center;">Responsable(s) :</span>
+        ${data.staff.map(s=>`<div class="chip person ${planningAssigneeFilter.has(s)?'active':''}" data-planning-person="${esc(s)}">${esc(s)}</div>`).join('')}
+        <div class="chip person ${planningAssigneeFilter.has('__none__')?'active':''}" data-planning-person="__none__">Non assigné</div>
+        ${planningAssigneeFilter.size>0 ? `<div class="chip ghost" id="clearPlanningPersonFilter" style="cursor:pointer;">✕ Effacer</div>` : ''}
+      </div>
+
+      ${planningViewMode==='list' ? viewPlanningList() : viewPlanningCalendar()}
+    </div>
+  `;
+}
+
+function viewPlanningList(){
+  const today = new Date().toISOString().slice(0,10);
+  const milestoneItems = data.milestones.map(m=>({
+    type:'milestone', id:m.id, date:m.date, title:m.title, desc:m.desc, done:m.done
+  }));
+  const taskItems = planningFilteredTasks().map(t=>({
+    type:'task', id:t.id, date:t.due, title:t.title, desc:t.category + ((t.assignees && t.assignees.length) ? ' · '+t.assignees.join(', ') : ''), done: t.status==='termine'
+  }));
+  const sorted = [...milestoneItems, ...taskItems].sort((a,b)=> (a.date||'9999').localeCompare(b.date||'9999'));
+
+  return `
+    ${sorted.length===0 ? `<div class="empty"><b>Rien ici</b>${planningAssigneeFilter.size>0?'Aucune tâche avec échéance pour ce(s) responsable(s).':'Ajoute une échéance sur une tâche dans l\u2019onglet Tâches.'}</div>` : `
+    <div class="timeline">
+      ${groupByDate(sorted).map(group => `
+        <div class="tl-date-group">
+          <div class="tl-date">${group.date ? new Date(group.date).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}) : 'Sans date'} <span style="color:var(--muted);font-weight:600;">· ${group.items.length} tâche${group.items.length>1?'s':''}</span></div>
+          ${group.items.map(item => item.type==='milestone' ? `
+            <div class="tl-item">
+              <div class="tl-dot ${item.done?'done':''}" data-toggle-milestone="${item.id}" style="cursor:pointer;"></div>
+              <div class="tl-title ${item.done?'strike':''}">${esc(item.title)}
+                <button class="del-btn" data-del-milestone="${item.id}" style="margin-left:6px;">🗑</button>
+              </div>
+              ${item.desc?`<div class="tl-desc">${esc(item.desc)}</div>`:''}
+            </div>
+          ` : `
+            <div class="tl-item">
+              <div class="tl-dot ${item.done?'done':''}" style="border-color:var(--forest);${item.done?'background:var(--forest);':''}"></div>
+              <div class="tl-title ${item.done?'strike':''}" data-open-task="${item.id}" style="cursor:pointer;">
+                <span class="tag cat" style="margin-right:6px;">Tâche</span><span class="${(item.date<today && !item.done)?'highlight':''}">${esc(item.title)}</span>${(item.date<today && !item.done)?' <span class="warn-icon" title="Échéance dépassée">⚠️</span>':''}
+              </div>
+              ${item.desc?`<div class="tl-desc">${esc(item.desc)}</div>`:''}
+            </div>
+          `).join('')}
+        </div>
+      `).join('')}
+    </div>`}
+  `;
+}
+
+function viewPlanningCalendar(){
+  const year = calendarMonth.getFullYear();
+  const month = calendarMonth.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const startOffset = (firstDay.getDay()+6)%7; // lundi = 0
+  const totalDays = new Date(year, month+1, 0).getDate();
+  const todayStr = new Date().toISOString().slice(0,10);
+
+  const tasksByDate = {};
+  planningFilteredTasks().forEach(t=>{
+    (tasksByDate[t.due] = tasksByDate[t.due] || []).push(t);
+  });
+  if(planningAssigneeFilter.size===0){
+    data.milestones.forEach(m=>{
+      if(!m.date) return;
+      (tasksByDate[m.date] = tasksByDate[m.date] || []).push(Object.assign({}, m, {isMilestone:true, priority:'', status: m.done?'termine':'pasCommence'}));
+    });
+  }
+
+  let cells = '';
+  for(let i=0;i<startOffset;i++){ cells += `<div class="cal-day empty"></div>`; }
+  for(let day=1; day<=totalDays; day++){
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const dayItems = tasksByDate[dateStr] || [];
+    const hasOverdue = dayItems.some(t=> dateStr < todayStr && t.status!=='termine');
+    const hasUrgent = dayItems.some(t=> t.priority==='urgent' && t.status!=='termine');
+    const isToday = dateStr === todayStr;
+    const isSelected = dateStr === selectedDay;
+    let badgeClass = hasOverdue ? 'cal-dot-alert' : (hasUrgent ? 'cal-dot-urgent' : 'cal-dot-normal');
+    cells += `
+      <div class="cal-day ${isToday?'today':''} ${isSelected?'selected':''}" data-day="${dateStr}">
+        <span class="cal-daynum">${day}</span>
+        ${dayItems.length ? `<span class="cal-count-badge ${badgeClass}">${dayItems.length}</span>` : ''}
+      </div>
+    `;
+  }
+
+  const monthLabel = calendarMonth.toLocaleDateString('fr-FR', {month:'long', year:'numeric'});
+  const selectedItems = selectedDay ? (tasksByDate[selectedDay] || []) : [];
+
+  return `
+    <div class="cal-nav">
+      <button class="btn ghost small" id="calPrevMonth">←</button>
+      <div class="cal-month-label">${monthLabel}</div>
+      <button class="btn ghost small" id="calNextMonth">→</button>
+    </div>
+    <div class="cal-grid cal-grid-head">
+      ${['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].map(d=>`<div class="cal-headcell">${d}</div>`).join('')}
+    </div>
+    <div class="cal-grid">${cells}</div>
+    <div class="cal-legend">
+      <span><span class="cal-count-badge cal-dot-alert" style="position:static;">!</span>Échéance dépassée</span>
+      <span><span class="cal-count-badge cal-dot-urgent" style="position:static;">!</span>Urgent</span>
+      <span><span class="cal-count-badge cal-dot-normal" style="position:static;">N</span>Tâche(s) prévue(s) — le chiffre = nb de tâches ce jour</span>
+    </div>
+    ${selectedDay ? `
+      <div class="cal-detail">
+        <div class="cal-detail-head">
+          <div class="view-title" style="font-size:14.5px;">${new Date(selectedDay).toLocaleDateString('fr-FR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})} <span style="color:var(--muted);font-weight:600;text-transform:none;font-size:12px;">· ${selectedItems.length} tâche${selectedItems.length>1?'s':''}</span></div>
+          <button class="del-btn" id="closeCalDetail">✕</button>
+        </div>
+        ${selectedItems.length===0 ? `<div class="empty" style="padding:10px 0;"><b>Rien ce jour-là</b>Aucune échéance à cette date.</div>` : selectedItems.map(item => item.isMilestone ? `
+          <div class="card" style="margin-bottom:8px;">
+            <div class="card-body">
+              <div class="card-title ${item.done?'strike':''}">${esc(item.title)}</div>
+              <div class="card-meta"><span class="tag cat">Étape clé</span></div>
+              ${item.desc?`<div style="font-size:12px;color:var(--muted);margin-top:6px;">${esc(item.desc)}</div>`:''}
+            </div>
+          </div>
+        ` : `
+          <div class="card" style="margin-bottom:8px;">
+            <div class="card-body">
+              <div class="card-title" data-open-task="${item.id}" style="cursor:pointer;">${esc(item.title)}</div>
+              <div class="card-meta">
+                <span class="tag cat">${esc(item.category)}</span>
+                <span class="tag prio-${item.priority}">${esc(prioLabel(item.priority))}</span>
+                ${item.assignees && item.assignees.length?`<span>👤 ${item.assignees.map(a=>esc(a)).join(', ')}</span>`:''}
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    ` : ''}
+  `;
+}
+
+/* ---------------- DISCUSSION ---------------- */
+function formatMsgDate(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}) + ' à ' + d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+}
+function renderMentions(text){
+  const escaped = esc(text);
+  const staffLower = data.staff.map(s=>s.toLowerCase());
+  return escaped.replace(/@([\p{L}0-9_-]+)/gu, (match, name)=>{
+    const lower = name.toLowerCase();
+    if(lower === 'toutlemonde' || staffLower.includes(lower)){
+      return `<span class="mention-tag">@${name}</span>`;
+    }
+    return match;
+  });
+}
+
+function viewDiscussion(){
+  const messages = (data.messages||[]).slice().sort((a,b)=> (a.createdAt||'').localeCompare(b.createdAt||''));
+  return `
+    <div class="view">
+      <div class="view-head">
+        <div>
+          <div class="view-title">Discussion</div>
+          <div class="view-sub">${messages.length} message(s) · tape @ pour taguer quelqu'un, ou @toutlemonde pour tout le monde</div>
+        </div>
+      </div>
+
+      <div class="chat-box" id="chatBox">
+        ${messages.length===0 ? `<div class="empty"><b>Aucun message</b>Sois le premier à écrire quelque chose au staff.</div>` : messages.map(m=>`
+          <div class="chat-msg">
+            <div class="chat-msg-head">
+              <span class="chat-author">${esc(m.author)}</span>
+              <span class="chat-time">${formatMsgDate(m.createdAt)}</span>
+              <button class="del-btn" data-del-msg="${m.id}" title="Supprimer">🗑</button>
+            </div>
+            <div class="chat-text">${renderMentions(m.text)}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="chat-compose">
+        <div class="mention-dropdown hidden" id="mentionDropdown"></div>
+        <textarea id="msgInput" placeholder="Écris un message... (@ pour taguer)" rows="2"></textarea>
+        <button class="btn lime" id="sendMsgBtn">Envoyer</button>
+      </div>
+    </div>
+  `;
+}
+
+
+/* ---------------- HANDLERS ---------------- */
+function esc(s){
+  return String(s??'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function attachViewHandlers(){
+  const c = document.getElementById('viewContainer');
+
+  // STAFF
+  if(currentView==='staff'){
+    document.getElementById('addStaffBtn')?.addEventListener('click', ()=>{
+      const input = document.getElementById('newStaffInput');
+      const v = input.value.trim();
+      if(!v){ return; }
+      if(data.staff.includes(v)){ showToast('Ce nom est déjà dans le staff'); return; }
+      data.staff.push(v);
+      saveData(); showToast('Membre ajouté'); renderView();
+    });
+    document.getElementById('newStaffInput')?.addEventListener('keydown', (e)=>{
+      if(e.key==='Enter') document.getElementById('addStaffBtn').click();
+    });
+    document.getElementById('saveBudgetLink')?.addEventListener('click', ()=>{
+      const val = document.getElementById('budgetLinkInput').value.trim();
+      data.budgetLink = val;
+      saveData(); showToast('Lien budget enregistré'); renderView();
+    });
+    document.getElementById('toggleExportPanel')?.addEventListener('click', ()=>{
+      document.getElementById('importPanel').classList.add('hidden');
+      const panel = document.getElementById('exportPanel');
+      document.getElementById('exportOutput').value = JSON.stringify(data, null, 2);
+      panel.classList.remove('hidden');
+      panel.scrollIntoView({behavior:'smooth', block:'center'});
+    });
+    document.getElementById('closeExportPanel')?.addEventListener('click', ()=>{
+      document.getElementById('exportPanel').classList.add('hidden');
+    });
+    document.getElementById('copyExportBtn')?.addEventListener('click', ()=>{
+      const ta = document.getElementById('exportOutput');
+      ta.select();
+      ta.setSelectionRange(0, ta.value.length);
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(ta.value)
+          .then(()=> showToast('Copié dans le presse-papiers'))
+          .catch(()=> showToast('Copie auto impossible : le texte est sélectionné, fais Ctrl+C / Cmd+C'));
+      } else {
+        showToast('Le texte est sélectionné : fais Ctrl+C / Cmd+C pour copier');
+      }
+    });
+    document.getElementById('toggleImportPanel')?.addEventListener('click', ()=>{
+      document.getElementById('exportPanel').classList.add('hidden');
+      const panel = document.getElementById('importPanel');
+      panel.classList.remove('hidden');
+      panel.scrollIntoView({behavior:'smooth', block:'center'});
+    });
+    document.getElementById('cancelImport')?.addEventListener('click', ()=>{
+      document.getElementById('importPanel').classList.add('hidden');
+    });
+    document.getElementById('confirmImport')?.addEventListener('click', ()=>{
+      const raw = document.getElementById('importInput').value.trim();
+      if(!raw){ showToast('Colle une sauvegarde avant d\u2019importer'); return; }
+      let parsed;
+      try{
+        parsed = JSON.parse(raw);
+      }catch(e){
+        showToast('Texte invalide : ce n\u2019est pas un JSON valide'); return;
+      }
+      if(typeof parsed !== 'object' || parsed===null){
+        showToast('Format inattendu'); return;
+      }
+      showConfirmModal('Importer la sauvegarde', 'Cela va remplacer toutes les données actuelles (staff, tâches, planning, budget, inscriptions) par celles de cette sauvegarde. Continuer ?', ()=>{
+        data = Object.assign({}, DEFAULT_SHAPE, parsed);
+        saveData();
+        showToast('Données importées');
+        renderHeader(); renderView();
+      });
+    });
+    c.querySelectorAll('[data-remove-staff]').forEach(b=>b.addEventListener('click', ()=>{
+      const name = b.dataset.removeStaff;
+      const assigned = data.tasks.filter(t=>(t.assignees||[]).includes(name)).length;
+      const doRemove = ()=>{
+        data.staff = data.staff.filter(s=>s!==name);
+        data.tasks.forEach(t=>{ if(t.assignees) t.assignees = t.assignees.filter(a=>a!==name); });
+        saveData(); showToast('Membre retiré'); renderView();
+      };
+      if(assigned>0){
+        showConfirmModal('Retirer du staff', `${name} a ${assigned} tâche(s) assignée(s). Les retirer du staff l'enlèvera de ces tâches. Continuer ?`, doRemove);
+      } else {
+        doRemove();
+      }
+    }));
+
+    document.getElementById('toggleParticipantForm')?.addEventListener('click', ()=>{
+      document.getElementById('participantForm').classList.toggle('hidden');
+    });
+    document.getElementById('cancelParticipant')?.addEventListener('click', ()=>{
+      document.getElementById('participantForm').classList.add('hidden');
+    });
+    document.getElementById('saveParticipant')?.addEventListener('click', ()=>{
+      const team = document.getElementById('pTeam').value.trim();
+      if(!team){ showToast("Nom d'équipe requis"); return; }
+      data.participants.push({
+        id: uid(), team,
+        contact: document.getElementById('pContact').value.trim(),
+        laps: document.getElementById('pLaps').value,
+        paid: document.getElementById('pPaid').value
+      });
+      saveData(); showToast('Équipe ajoutée'); renderHeader(); renderView();
+    });
+    c.querySelectorAll('[data-del-participant]').forEach(b=>b.addEventListener('click', ()=>{
+      showConfirmModal('Supprimer', 'Supprimer cette équipe ?', ()=>{
+        data.participants = data.participants.filter(x=>x.id!==b.dataset.delParticipant);
+        saveData(); renderHeader(); renderView();
+      });
+    }));
+  }
+
+  // TASKS
+  if(currentView==='tasks'){
+    document.getElementById('taskSearchInput')?.addEventListener('input', (e)=>{
+      taskSearchQuery = e.target.value;
+      const cursorPos = e.target.selectionStart;
+      renderView();
+      const newInput = document.getElementById('taskSearchInput');
+      if(newInput){ newInput.focus(); newInput.setSelectionRange(cursorPos, cursorPos); }
+    });
+    document.getElementById('toggleTaskForm')?.addEventListener('click', ()=>{
+      editingTaskId = null;
+      document.getElementById('taskFormLabel').textContent = 'Titre';
+      document.getElementById('tTitle').value='';
+      document.getElementById('tCat').value = CATEGORIES[0];
+      document.getElementById('tDue').value='';
+      document.getElementById('tStatus').value='pasCommence';
+      document.getElementById('tPrio').value='basse';
+      document.getElementById('tNotes').value='';
+      document.getElementById('tLinks').value='';
+      document.querySelectorAll('#tAssigneeChips .chip[data-assignee-chip]').forEach(ch=>ch.classList.remove('active'));
+      document.getElementById('saveTask').textContent = 'Enregistrer';
+      document.getElementById('taskForm').classList.remove('hidden');
+    });
+    c.querySelectorAll('#tAssigneeChips .chip[data-assignee-chip]').forEach(ch=>ch.addEventListener('click', ()=>{
+      ch.classList.toggle('active');
+    }));
+    document.getElementById('cancelTask')?.addEventListener('click', ()=>{
+      editingTaskId = null;
+      document.getElementById('taskForm').classList.add('hidden');
+    });
+    document.getElementById('saveTask')?.addEventListener('click', ()=>{
+      const title = document.getElementById('tTitle').value.trim();
+      if(!title){ showToast('Titre requis'); return; }
+      const assignees = Array.from(document.querySelectorAll('#tAssigneeChips .chip[data-assignee-chip].active')).map(ch=>ch.dataset.assigneeChip);
+      const fields = {
+        title,
+        category: document.getElementById('tCat').value,
+        assignees,
+        due: document.getElementById('tDue').value,
+        status: document.getElementById('tStatus').value,
+        priority: document.getElementById('tPrio').value,
+        notes: document.getElementById('tNotes').value.trim(),
+        links: parseLinks(document.getElementById('tLinks').value)
+      };
+      if(editingTaskId){
+        const t = data.tasks.find(x=>x.id===editingTaskId);
+        Object.assign(t, fields);
+        editingTaskId = null;
+        showToast('Tâche modifiée');
+      } else {
+        data.tasks.push(Object.assign({ id: uid() }, fields));
+        showToast('Tâche ajoutée');
+      }
+      document.getElementById('taskForm').classList.add('hidden');
+      saveData(); renderHeader(); renderView();
+    });
+    c.querySelectorAll('.chip[data-filter]').forEach(ch=>ch.addEventListener('click', ()=>{
+      taskFilter = ch.dataset.filter; renderView();
+    }));
+    c.querySelectorAll('.chip[data-person]').forEach(ch=>ch.addEventListener('click', ()=>{
+      const p = ch.dataset.person;
+      if(taskAssigneeFilter.has(p)) taskAssigneeFilter.delete(p);
+      else taskAssigneeFilter.add(p);
+      renderView();
+    }));
+    document.getElementById('clearPersonFilter')?.addEventListener('click', ()=>{
+      taskAssigneeFilter.clear(); renderView();
+    });
+    c.querySelectorAll('.chip[data-prio]').forEach(ch=>ch.addEventListener('click', ()=>{
+      const p = ch.dataset.prio;
+      if(taskPriorityFilter.has(p)) taskPriorityFilter.delete(p);
+      else taskPriorityFilter.add(p);
+      renderView();
+    }));
+    document.getElementById('clearPrioFilter')?.addEventListener('click', ()=>{
+      taskPriorityFilter.clear(); renderView();
+    });
+    c.querySelectorAll('.chip[data-status-filter]').forEach(ch=>ch.addEventListener('click', ()=>{
+      const s = ch.dataset.statusFilter;
+      if(taskStatusFilter.has(s)) taskStatusFilter.delete(s);
+      else taskStatusFilter.add(s);
+      renderView();
+    }));
+    document.getElementById('clearStatusFilter')?.addEventListener('click', ()=>{
+      taskStatusFilter.clear(); renderView();
+    });
+    c.querySelectorAll('[data-status]').forEach(sel=>sel.addEventListener('change', ()=>{
+      const t = data.tasks.find(x=>x.id===sel.dataset.status);
+      t.status = sel.value;
+      saveData(); renderHeader(); renderView();
+    }));
+    c.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click', ()=>{
+      openTaskEditor(b.dataset.edit);
+    }));
+    c.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', ()=>{
+      showConfirmModal('Supprimer', 'Supprimer cette tâche ?', ()=>{
+        data.tasks = data.tasks.filter(x=>x.id!==b.dataset.del);
+        saveData(); renderHeader(); renderView();
+      });
+    }));
+    if(pendingEditTaskId){
+      const id = pendingEditTaskId;
+      pendingEditTaskId = null;
+      openTaskEditor(id);
+    }
+  }
+
+  // PLANNING
+  if(currentView==='planning'){
+    c.querySelectorAll('.chip[data-planning-mode]').forEach(ch=>ch.addEventListener('click', ()=>{
+      planningViewMode = ch.dataset.planningMode;
+      renderView();
+    }));
+    c.querySelectorAll('.chip[data-planning-person]').forEach(ch=>ch.addEventListener('click', ()=>{
+      const p = ch.dataset.planningPerson;
+      if(planningAssigneeFilter.has(p)) planningAssigneeFilter.delete(p);
+      else planningAssigneeFilter.add(p);
+      renderView();
+    }));
+    document.getElementById('clearPlanningPersonFilter')?.addEventListener('click', ()=>{
+      planningAssigneeFilter.clear(); renderView();
+    });
+    document.getElementById('calPrevMonth')?.addEventListener('click', ()=>{
+      calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth()-1, 1);
+      renderView();
+    });
+    document.getElementById('calNextMonth')?.addEventListener('click', ()=>{
+      calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth()+1, 1);
+      renderView();
+    });
+    c.querySelectorAll('.cal-day[data-day]').forEach(d=>d.addEventListener('click', ()=>{
+      const day = d.dataset.day;
+      selectedDay = (selectedDay===day) ? null : day;
+      renderView();
+    }));
+    document.getElementById('closeCalDetail')?.addEventListener('click', ()=>{
+      selectedDay = null; renderView();
+    });
+    c.querySelectorAll('[data-toggle-milestone]').forEach(b=>b.addEventListener('click', ()=>{
+      const m = data.milestones.find(x=>x.id===b.dataset.toggleMilestone);
+      m.done = !m.done; saveData(); renderView();
+    }));
+    c.querySelectorAll('[data-del-milestone]').forEach(b=>b.addEventListener('click', ()=>{
+      data.milestones = data.milestones.filter(x=>x.id!==b.dataset.delMilestone);
+      saveData(); renderView();
+    }));
+    c.querySelectorAll('[data-open-task]').forEach(el=>el.addEventListener('click', ()=>{
+      pendingEditTaskId = el.dataset.openTask;
+      currentView = 'tasks';
+      document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.view==='tasks'));
+      document.getElementById('settingsBtn')?.classList.remove('active');
+      renderView();
+    }));
+  }
+
+  // DISCUSSION
+  if(currentView==='discussion'){
+    const chatBox = document.getElementById('chatBox');
+    if(chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+
+    const msgInput = document.getElementById('msgInput');
+    const dropdown = document.getElementById('mentionDropdown');
+
+    function closeDropdown(){
+      dropdown.classList.add('hidden');
+      dropdown.innerHTML = '';
+    }
+
+    function updateDropdown(){
+      const val = msgInput.value;
+      const cursor = msgInput.selectionStart;
+      const uptoCursor = val.slice(0, cursor);
+      const match = uptoCursor.match(/@([\p{L}0-9_-]*)$/u);
+      if(!match){ closeDropdown(); return; }
+      const query = match[1].toLowerCase();
+      const options = ['toutlemonde', ...data.staff].filter(name=> name.toLowerCase().startsWith(query));
+      if(options.length===0){ closeDropdown(); return; }
+      dropdown.innerHTML = options.map(name=>`<div class="mention-option" data-mention="${esc(name)}">@${name==='toutlemonde'?'<strong>toutlemonde</strong>':esc(name)}</div>`).join('');
+      dropdown.classList.remove('hidden');
+      dropdown.querySelectorAll('[data-mention]').forEach(opt=>{
+        opt.addEventListener('mousedown', (e)=>{
+          e.preventDefault();
+          const name = opt.dataset.mention;
+          const before = val.slice(0, cursor).replace(/@([\p{L}0-9_-]*)$/u, '@'+name+' ');
+          const after = val.slice(cursor);
+          msgInput.value = before + after;
+          const newPos = before.length;
+          msgInput.focus();
+          msgInput.setSelectionRange(newPos, newPos);
+          closeDropdown();
+        });
+      });
+    }
+
+    msgInput?.addEventListener('input', updateDropdown);
+    msgInput?.addEventListener('keydown', (e)=>{
+      if(e.key==='Escape') closeDropdown();
+      if(e.key==='Enter' && !e.shiftKey){
+        e.preventDefault();
+        document.getElementById('sendMsgBtn').click();
+      }
+    });
+    msgInput?.addEventListener('blur', ()=> setTimeout(closeDropdown, 150));
+
+    document.getElementById('sendMsgBtn')?.addEventListener('click', ()=>{
+      const text = msgInput.value.trim();
+      if(!text) return;
+      ensureUserName((name)=>{
+        data.messages = data.messages || [];
+        data.messages.push({ id: uid(), author: name, text, createdAt: new Date().toISOString() });
+        saveData();
+        renderView();
+      });
+    });
+
+    c.querySelectorAll('[data-del-msg]').forEach(b=>b.addEventListener('click', ()=>{
+      showConfirmModal('Supprimer', 'Supprimer ce message ?', ()=>{
+        data.messages = (data.messages||[]).filter(x=>x.id!==b.dataset.delMsg);
+        saveData(); renderView();
+      });
+    }));
+  }
+
+}
+
+loadData();
+</script>
+</body>
+</html>
